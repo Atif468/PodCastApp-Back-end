@@ -1,69 +1,56 @@
-import Podcast from '../models/Podcast.js';
-import User from '../models/userModel.js';
-import cloudinary from '../config/cloudinary.js';
-import fs from 'fs';
+import cloudinary from "cloudinary";
+import Podcastmodel from "../models/Podcast.js";
 
-// Upload Podcast
+cloudinary.v2.config({
+  cloud_name: "dc1uzsmk2",
+  api_key: "227675225885688",
+  api_secret: "zlvmXJ_mSGhg3_eYiBc2-kHKIQY",
+});
+
+const cloudinaryUploadAudio = async (fileBuffer) => {
+  try {
+    const data = await cloudinary.v2.uploader.upload_stream(
+      { resource_type: "auto" },
+      (error, result) => {
+        if (error) {
+          console.error("Cloudinary Error:", error);
+          throw new Error("Internal Server Error (cloudinary)");
+        }
+        return result;
+      }
+    ).end(fileBuffer);
+  } catch (error) {
+    console.log("Cloudinary Error:", error);
+    throw new Error("Internal Server Error (cloudinary)");
+  }
+};
+
+
 export const uploadPodcast = async (req, res) => {
-  try {
-    const result = await cloudinary.uploader.upload(req.file.path, {
-      resource_type: 'video',
-    });
+  console.log("File Upload Data:", req.file); // Check what is being uploaded
 
-    const newPodcast = new Podcast({
-      title: req.body.title,
-      description: req.body.description,
+  const { title, author } = req.body;
+
+  if (!title || !author || !req.file) {
+    return res.status(400).json({ message: "All fields are required." });
+  }
+
+  try {
+    const result = await cloudinaryUploadAudio(req.file.buffer);
+    if (!result || !result.secure_url) {
+      throw new Error("Failed to get secure URL from Cloudinary response.");
+    }
+
+    const newPodcast = {
+      title: title,
+      author: author,
       audioUrl: result.secure_url,
-      createdBy: req.user._id,
-    });
-
-    const podcast = await newPodcast.save();
-    fs.unlinkSync(req.file.path); // Remove file from local uploads after upload
-    res.status(201).json(podcast);
+    };
+    
+    await Podcastmodel.create(newPodcast);
+    res.status(201).json({ message: "Audio file uploaded and saved in the database.", podcast: newPodcast });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to upload podcast' });
-  }
-};
-
-// Get Podcasts
-export const getPodcasts = async (req, res) => {
-  try {
-    const podcasts = await Podcast.find().populate('createdBy', 'username');
-    res.status(200).json(podcasts);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch podcasts' });
-  }
-};
-
-// Like a Podcast
-export const likePodcast = async (req, res) => {
-  try {
-    const podcast = await Podcast.findById(req.params.id);
-    if (!podcast) return res.status(404).json({ error: 'Podcast not found' });
-
-    podcast.likes += 1;
-    await podcast.save();
-
-    const user = await User.findById(req.user._id);
-    user.likedPodcasts.push(podcast._id);
-    await user.save();
-
-    res.status(200).json({ message: 'Podcast liked' });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to like podcast' });
-  }
-};
-
-// Get User Info
-export const getUserBoard = async (req, res) => {
-  try {
-    const user = await User.findById(req.user._id)
-      .populate('likedPodcasts')
-      .populate('createdPodcasts')
-      .populate('playlist');
-
-    res.status(200).json(user);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch user info' });
+    console.error("Error in uploading podcast:", error);
+    res.status(500).json({ message: "Server error." });
   }
 };

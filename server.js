@@ -22,6 +22,7 @@ app.get("/" ,async (req,res)=>{
 
 app.use('/api', userRoutes);
 
+
 app.use("/api/podcasts", podcastRoutes);
 
 const PORT = process.env.PORT || 5000;
