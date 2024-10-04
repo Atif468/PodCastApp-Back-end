@@ -1,56 +1,66 @@
-import cloudinary from "cloudinary";
-import Podcastmodel from "../models/Podcast.js";
+import cloudinary from "../config/cloudinary.js";
+import PodcastModel from "../models/Podcast.js";
 
-cloudinary.v2.config({
-  cloud_name: "dc1uzsmk2",
-  api_key: "227675225885688",
-  api_secret: "zlvmXJ_mSGhg3_eYiBc2-kHKIQY",
-});
-
-const cloudinaryUploadAudio = async (fileBuffer) => {
-  try {
-    const data = await cloudinary.v2.uploader.upload_stream(
-      { resource_type: "auto" },
+ const cloudinaryUploadAudio = (fileBuffer) => {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      { resource_type: "auto" }, 
       (error, result) => {
         if (error) {
           console.error("Cloudinary Error:", error);
-          throw new Error("Internal Server Error (cloudinary)");
+          reject(error);
+        } else {
+          resolve(result);
         }
-        return result;
       }
-    ).end(fileBuffer);
-  } catch (error) {
-    console.log("Cloudinary Error:", error);
-    throw new Error("Internal Server Error (cloudinary)");
-  }
+    );
+    uploadStream.end(fileBuffer);
+  });
 };
 
+ export const uploadPodcast = async (req, res) => {
+  console.log("File Upload Data:", req.file); 
 
-export const uploadPodcast = async (req, res) => {
-  console.log("File Upload Data:", req.file); // Check what is being uploaded
+   if (req.file && req.file.buffer) {
+    console.log("Buffer size:", req.file.buffer.length);  
+  } else {
+    console.log("No file buffer found."); 
+    return res.status(400).json({ message: "No file uploaded." });
+  }
 
   const { title, author } = req.body;
 
-  if (!title || !author || !req.file) {
+   if (!title || !author || !req.file) {
     return res.status(400).json({ message: "All fields are required." });
   }
 
   try {
-    const result = await cloudinaryUploadAudio(req.file.buffer);
-    if (!result || !result.secure_url) {
+    console.log(req.body); 
+    console.log(req.file);  
+
+     const result = await cloudinaryUploadAudio(req.file.buffer);
+    
+     if (!result || !result.secure_url) {
       throw new Error("Failed to get secure URL from Cloudinary response.");
     }
 
-    const newPodcast = {
+     const newPodcast = {
       title: title,
       author: author,
       audioUrl: result.secure_url,
     };
     
-    await Podcastmodel.create(newPodcast);
-    res.status(201).json({ message: "Audio file uploaded and saved in the database.", podcast: newPodcast });
+     await PodcastModel.create(newPodcast);
+    res.status(201).json({ message: "Success", podcast: newPodcast });
   } catch (error) {
     console.error("Error in uploading podcast:", error);
     res.status(500).json({ message: "Server error." });
   }
 };
+
+export const getPodCast = async (req, res) => {
+
+    const data = await PodcastModel.find({});
+
+    res.send({"data":data});
+}

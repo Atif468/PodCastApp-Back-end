@@ -17,6 +17,10 @@ const podcastSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    dislikes: {
+      type: Number,
+      default: 0,
+    },
     views: {
       type: Number,
       default: 0,
@@ -29,6 +33,6 @@ const podcastSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Podcastmodel = mongoose.model("Podcast", podcastSchema);
+const PodcastModel = mongoose.model("Podcast", podcastSchema);
 
-export default Podcastmodel;
+export default PodcastModel;
