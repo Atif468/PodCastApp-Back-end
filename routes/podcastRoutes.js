@@ -5,7 +5,6 @@
 
 // const router = express.Router();
 
-
 // const storage = multer.diskStorage({
 //     destination: (req, file, cb) => {
 //       cb(null, "./uploads");
@@ -14,8 +13,8 @@
 //       cb(null, file.originalname);
 //     },
 //   });
-  
-//   const upload = multer({ storage }); 
+
+//   const upload = multer({ storage });
 
 // router.post('/upload', upload.single('audioFile'), uploadPodcast);
 
@@ -27,8 +26,11 @@ import { getPodCast, uploadPodcast } from "../controllers/podcastController.js";
 
 const router = express.Router();
 
- router.post("/upload", upload.single("audioFile"), uploadPodcast);
+router.post("/upload", upload.fields([
+    { name: "audioFile", maxCount: 1 },
+    { name: "imageFile", maxCount: 1 },
+  ]), uploadPodcast);
 
- router.get('/data', getPodCast);
+router.get("/data", getPodCast);
 
 export default router;
