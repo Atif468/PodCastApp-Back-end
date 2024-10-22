@@ -52,7 +52,7 @@ export const Login = async (req, res) => {
       expiresIn: "1h",
     });
 
-    res.status(200).json({ message: "Login successful", token }); // Ensure the token is included in the response
+    res.status(200).json({ message: "Login successful", token }); 
   } catch (error) {
     console.error("Error during login:", error);
     res.status(500).json({ error: "Server error. Please try again later." });
