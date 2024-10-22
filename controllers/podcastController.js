@@ -83,52 +83,53 @@ export const getPodCast = async (req, res) => {
   }
 };
 
-export const incrementViews = async (req, res) => {
-  const { podcastId } = req.params;
+// export const incrementViews = async (req, res) => {
+//   const { podcastId } = req.params;
 
-  try {
-    const podcast = await PodcastModel.findById(podcastId);
-    if (!podcast) {
-      return res.status(404).json({ message: "Podcast not found" });
-    }
+//   try {
+//     const podcast = await PodcastModel.findById(podcastId);
+//     if (!podcast) {
+//       return res.status(404).json({ message: "Podcast not found" });
+//     }
 
-    podcast.views += 1;
-    await podcast.save();
+//     podcast.views += 1;
+//     await podcast.save();
 
-    res.status(200).json({ message: "View count updated", views: podcast.views });
-  } catch (error) {
-    console.error("Error updating views:", error);
-    res.status(500).json({ message: "Server error" });
-  }
-};
-
+//     res.status(200).json({ message: "View count updated", views: podcast.views });
+//   } catch (error) {
+//     console.error("Error updating views:", error);
+//     res.status(500).json({ message: "Server error" });
+//   }
+// };
 
 export const toggleLike = async (req, res) => {
   const { podcastId } = req.params;
 
   try {
-    const podcast = await PodcastModel.findById(podcastId);
-    if (!podcast) {
-      return res.status(404).json({ message: "Podcast not found" });
-    }
+      const podcast = await PodcastModel.findById(podcastId);
 
-    const userId = req.user.id;
+      if (!podcast) {
+          return res.status(404).json({ message: "Podcast not found" });
+      }
 
-    if (podcast.likedBy.includes(userId)) {
-      // Unlike the podcast
-      podcast.likes -= 1;
-      podcast.likedBy = podcast.likedBy.filter((id) => id !== userId);
-    } else {
-      // Like the podcast
-      podcast.likes += 1;
-      podcast.likedBy.push(userId);
-    }
+      const userId = req.user._id; 
+      if (!podcast.likedBy) {
+          podcast.likedBy = [];
+      }
 
-    await podcast.save();
+      if (podcast.likedBy.includes(userId.toString())) { 
+          podcast.likes -= 1;
+          podcast.likedBy = podcast.likedBy.filter((id) => id !== userId.toString());
+      } else {
+          podcast.likes += 1;
+          podcast.likedBy.push(userId.toString());
+      }
 
-    res.status(200).json({ message: "Like status updated", likes: podcast.likes });
+      await podcast.save();
+
+      res.status(200).json({ message: "Like status updated", likes: podcast.likes, likedBy: podcast.likedBy });
   } catch (error) {
-    console.error("Error toggling like:", error);
-    res.status(500).json({ message: "Server error" });
+      console.error("Error toggling like:", error);
+      res.status(500).json({ message: "Server error" });
   }
 };
