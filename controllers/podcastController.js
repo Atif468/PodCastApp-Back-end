@@ -1,5 +1,6 @@
 import cloudinary from "../config/cloudinary.js";
 import PodcastModel from "../models/Podcast.js";
+import UserModel from '../models/userModel.js';
 
 const cloudinaryUpload = (fileBuffer, resourceType) => {
   return new Promise((resolve, reject) => {
@@ -20,9 +21,7 @@ const cloudinaryUpload = (fileBuffer, resourceType) => {
 export const uploadPodcast = async (req, res) => {
   try {
     const { title, author } = req.body;
-    console.log(req.body);
-    console.log("Received files:", req.files);
-
+    console.log(req);
     if (!title || !author || !req.files.audioFile || !req.files.imageFile) {
       return res.status(400).json({
         message: "All fields are required, including audio and image.",
@@ -32,42 +31,22 @@ export const uploadPodcast = async (req, res) => {
     const audioFile = req.files.audioFile[0];
     const imageFile = req.files.imageFile[0];
 
-    if (audioFile && audioFile.buffer) {
-      console.log("Audio file buffer size:", audioFile.buffer.length);
-    } else {
-      console.error("Audio file buffer is missing");
-      return res.status(400).json({ message: "Audio file is missing." });
-    }
-
-    if (imageFile && imageFile.buffer) {
-      console.log("Image file buffer size:", imageFile.buffer.length);
-    } else {
-      console.error("Image file buffer is missing");
-      return res.status(400).json({ message: "Image file is missing." });
-    }
-
     const audioResult = await cloudinaryUpload(audioFile.buffer, "auto");
-    console.log("Audio upload result:", audioResult);
-
     const imageResult = await cloudinaryUpload(imageFile.buffer, "image");
-    console.log("Image upload result:", imageResult);
-
-    if (!audioResult.secure_url || !imageResult.secure_url) {
-      throw new Error("Failed to get secure URLs from Cloudinary response.");
-    }
 
     const newPodcast = {
-      title: title,
-      author: author,
+      title,
+      author,
       audioUrl: audioResult.secure_url,
       imageUrl: imageResult.secure_url,
     };
 
-    await PodcastModel.create(newPodcast);
+    const podcast = await PodcastModel.create(newPodcast);
 
-    res
-      .status(201)
-      .json({ message: "Podcast uploaded successfully", podcast: newPodcast });
+    req.user.createdPodcasts.push(podcast._id);
+    await req.user.save();
+
+    res.status(201).json({ message: "Podcast uploaded successfully", podcast });
   } catch (error) {
     console.error("Error in uploading podcast:", error);
     res.status(500).json({ message: "Server error.", error: error.message });
@@ -106,30 +85,94 @@ export const toggleLike = async (req, res) => {
   const { podcastId } = req.params;
 
   try {
-      const podcast = await PodcastModel.findById(podcastId);
+    const podcast = await PodcastModel.findById(podcastId);
 
-      if (!podcast) {
-          return res.status(404).json({ message: "Podcast not found" });
-      }
+    if (!podcast) {
+      return res.status(404).json({ message: "Podcast not found" });
+    }
 
-      const userId = req.user._id; 
-      if (!podcast.likedBy) {
-          podcast.likedBy = [];
-      }
+    const username = req.user.name;
+    const userId = req.user._id;
 
-      if (podcast.likedBy.includes(userId.toString())) { 
-          podcast.likes -= 1;
-          podcast.likedBy = podcast.likedBy.filter((id) => id !== userId.toString());
-      } else {
-          podcast.likes += 1;
-          podcast.likedBy.push(userId.toString());
-      }
+    if (!podcast.likedBy) {
+      podcast.likedBy = [];
+    }
 
-      await podcast.save();
+    // Toggle like status
+    if (podcast.likedBy.includes(username.toString())) {
+      podcast.likes -= 1;
+      podcast.likedBy = podcast.likedBy.filter(
+        (id) => id !== username.toString()
+      );
 
-      res.status(200).json({ message: "Like status updated", likes: podcast.likes, likedBy: podcast.likedBy });
+      req.user.likedPodcasts = req.user.likedPodcasts.filter(
+        (id) => id.toString() !== podcastId
+      );
+    } else {
+      podcast.likes += 1;
+      podcast.likedBy.push(username.toString());
+
+      req.user.likedPodcasts.push(podcastId);
+    }
+
+    await podcast.save();
+    await req.user.save();
+
+    res.status(200).json({
+      message: "Like status updated",
+      likes: podcast.likes,
+      likedBy: podcast.likedBy,
+    });
   } catch (error) {
-      console.error("Error toggling like:", error);
-      res.status(500).json({ message: "Server error" });
+    console.error("Error toggling like:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const getLiked = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Find the podcast by Object ID
+    const podcastId = "6700e9fa5dd3c0525e842273"; // Ensure this is a valid ObjectId
+    const podcast = await PodcastModel.findById(podcastId);
+
+    if (!podcast) {
+      return res.status(404).json({ message: "Podcast not found" });
+    }
+
+    res.json(podcast);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+export const addToPlaylist = async (req, res) => {
+  const { podcastId } = req.params;
+  const userId = req.user._id;
+
+  try {
+    const podcast = await PodcastModel.findById(podcastId);
+    if (!podcast) {
+      return res.status(404).json({ message: "Podcast not found" });
+    }
+
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (!user.playlist.includes(podcastId)) {
+      user.playlist.push(podcastId);
+      await user.save();
+      return res.status(200).json({ message: "Podcast added to playlist" });
+    } else {
+      return res.status(400).json({ message: "Podcast already in playlist" });
+    }
+  } catch (error) {
+    console.error("Error adding to playlist:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };

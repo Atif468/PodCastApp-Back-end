@@ -1,5 +1,6 @@
 import User from "../models/userModel.js";
-import bcrypt from "bcryptjs";
+import bcrypt from "bcrypt";
+
 import jwt from "jsonwebtoken";
 
 export const SignUp = async (req, res) => {
@@ -20,8 +21,9 @@ export const SignUp = async (req, res) => {
     const newUser = await User.create({
       name,
       email,
-      password: hashedPassword,
+      password,
     });
+    
 
     const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
       expiresIn: "1h",
@@ -43,7 +45,12 @@ export const Login = async (req, res) => {
       return res.status(401).json({ error: "User not found" });
     }
 
+    console.log("Entered password:", password);  // Plain password from request
+    console.log("Stored password hash:", user.password);  // Hashed password from DB
+
     const isPasswordValid = await bcrypt.compare(password, user.password);
+    console.log("Is password valid?", isPasswordValid);  // Should log true if match
+
     if (!isPasswordValid) {
       return res.status(401).json({ error: "Invalid password" });
     }
@@ -52,12 +59,13 @@ export const Login = async (req, res) => {
       expiresIn: "1h",
     });
 
-    res.status(200).json({ message: "Login successful", token }); 
+    res.status(200).json({ message: "Login successful", token });
   } catch (error) {
     console.error("Error during login:", error);
     res.status(500).json({ error: "Server error. Please try again later." });
   }
 };
+
 
 export const GetUserInfo = async (req, res) => {
   try {
@@ -67,9 +75,7 @@ export const GetUserInfo = async (req, res) => {
     }
 
     res.status(200).json({
-      name: user.name,
-      email: user.email,
-      profilePicture: user.profilePicture,
+      user
     });
   } catch (err) {
     console.error("Server Error:", err);
