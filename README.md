@@ -7,7 +7,7 @@
 
 ---
 
-### 🚀 Features
+<h2>🚀 Features</h2>
 
 - **User Authentication**: 
   - Secure sign-up and log-in.
@@ -24,7 +24,7 @@
 
 ---
 
-### 🛠️ Technologies Used:
+<h2> 🛠️ Technologies Used:</h2>
 
 <div>
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" height="40" alt="Node.js" />
@@ -36,7 +36,7 @@
 
 ---
 
-### ⚙️ Getting Started
+<h2>⚙️ Getting Started</h2>
 
 To get your development environment up and running, follow these steps:
 
@@ -44,7 +44,6 @@ To get your development environment up and running, follow these steps:
    ```bash
    git clone <repository-link>
    cd podcast-backend
-
 
 <h2>🛠️ API Endpoints:</h2>
 
