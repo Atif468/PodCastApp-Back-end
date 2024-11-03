@@ -1,30 +1,14 @@
-Podcast Platform Backend
-This is the backend for the Podcast Platform, developed with Node.js, Express.js, MongoDB, and Cloudinary for media management. It provides RESTful APIs for user authentication, podcast uploads, playlist management, and podcast interactions (like, views, and playlists).
-
-Table of Contents
-Features
-Technologies Used
-Setup Instructions
-Environment Variables
-API Endpoints
-User Authentication
-Podcast Management
-Playlist and Interactions
-Models
-Error Handling
-Features
-User Authentication: Sign-up, login, and token-based authentication.
-Podcast Upload: Allows users to upload podcasts with audio and cover images.
-Playlist Management: Add/remove podcasts to/from playlists.
-Podcast Interactions: Toggle likes on podcasts.
-User Information Retrieval: Get user information and liked podcasts.
-Technologies Used
-Node.js & Express.js for server and routing
-MongoDB & Mongoose for database and data modeling
-Cloudinary for media file management
-JWT for secure token-based authentication
-Bcrypt for password hashing
-Setup Instructions
+<h1 align="center">🎧 Podcast Platform Backend</h1> <h3 align="center">A robust backend for managing user authentication, podcasts, playlists, and media storage</h3> <div align="center"> <img alt="Server" width="400" src="https://miro.medium.com/max/680/0*7Q3yvSIv_t0ioJ-Z.gif"/> </div>
+🔍 APIs for user authentication, podcast uploads, and interactions
+💾 Using MongoDB for data storage and Cloudinary for media management
+🔒 JWT and Bcrypt for secure authentication
+<h3 align="center">🛠️ Technologies Used:</h3> <div align="center"> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" height="40" alt="Node.js" /> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/express/express-original.svg" height="40" alt="Express.js" /> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg" height="40" alt="MongoDB" /> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cloudinary/cloudinary-original.svg" height="40" alt="Cloudinary" /> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" height="40" alt="GitHub" /> </div>
+🚀 Features
+User Authentication: Sign up, log in, and JWT-secured access.
+Podcast Management: Upload and organize podcasts with audio and image files.
+Playlists & Likes: Create playlists and interact with podcasts.
+Secure Media Storage: Cloudinary integration for audio and image files.
+⚙️ Setup Instructions
 Clone the repository:
 
 bash
@@ -36,7 +20,7 @@ Install dependencies:
 bash
 Copy code
 npm install
-Configure Environment Variables: Create a .env file in the root directory with the following variables:
+Set up Environment Variables in a .env file:
 
 plaintext
 Copy code
@@ -50,91 +34,6 @@ Run the Server:
 bash
 Copy code
 npm start
-The server will start on http://localhost:8080.
-
-Environment Variables
-Set the following environment variables in your .env file:
-
-Variable	Description
-JWT_SECRET	Secret key for JWT token encryption
-MONGODB_URI	MongoDB connection URI
-CLOUDINARY_CLOUD_NAME	Cloudinary cloud name
-CLOUDINARY_API_KEY	Cloudinary API key
-CLOUDINARY_API_SECRET	Cloudinary API secret
-API Endpoints
-User Authentication
-1. Sign Up
-Endpoint: POST /auth/signup
-Description: Register a new user.
-Request:
-json
-Copy code
-{
-  "name": "string",
-  "email": "string",
-  "password": "string"
-}
-Response: Success message and JWT token.
-2. Login
-Endpoint: POST /auth/login
-Description: Authenticate user and get a JWT token.
-Request:
-json
-Copy code
-{
-  "email": "string",
-  "password": "string"
-}
-Response: Success message and JWT token.
-Podcast Management
-1. Upload Podcast
-Endpoint: POST /podcast/upload
-Description: Allows authenticated users to upload a podcast with audio and cover image files.
-Request: Form-data with title, author, audioFile, and imageFile.
-Response: Success message with podcast details.
-📌 Screenshot: Insert an image here showing the form-data for a podcast upload.
-
-2. Get All Podcasts
-Endpoint: GET /podcast
-Description: Fetches a list of all podcasts.
-Response: Array of podcast objects.
-Playlist and Interactions
-1. Add to Playlist
-Endpoint: PATCH /playlist/add/:podcastId
-Description: Adds a podcast to the user's playlist if not already added.
-Response: Success message.
-2. Toggle Like
-Endpoint: POST /podcast/like/:podcastId
-Description: Toggles like on a podcast.
-Response: Updated like count and user list who liked the podcast.
-Models
-User Model
-javascript
-Copy code
-{
-  name: String,
-  email: String,
-  password: String,
-  playlist: [ObjectId], // Array of podcast IDs
-  likedPodcasts: [ObjectId], // Array of liked podcast IDs
-  createdPodcasts: [ObjectId] // Array of created podcast IDs
-}
-Podcast Model
-javascript
-Copy code
-{
-  title: String,
-  author: String,
-  audioUrl: String,
-  imageUrl: String,
-  likes: Number,
-  likedBy: [String], // Array of user IDs
-  views: Number
-}
-Error Handling
-Each route has error handling to ensure meaningful error messages and to catch possible issues with requests or server errors. Typical error responses include:
-
-400 Bad Request: For missing or invalid request data.
-401 Unauthorized: For requests missing authentication or invalid tokens.
-404 Not Found: For missing resources, such as a podcast or user.
-500 Server Error: For any unexpected errors on the server side.
+<h3 align="center">API Endpoints:</h3> <div align="center"> <table> <tr><th>Endpoint</th><th>Description</th></tr> <tr><td>POST /auth/signup</td><td>Register a new user</td></tr> <tr><td>POST /auth/login</td><td>Login and get JWT token</td></tr> <tr><td>POST /podcast/upload</td><td>Upload podcast with audio and image</td></tr> <tr><td>PATCH /playlist/add/:podcastId</td><td>Add a podcast to the playlist</td></tr> <tr><td>POST /podcast/like/:podcastId</td><td>Toggle like on a podcast</td></tr> </table> </div>
+<h3 align="center">Error Handling:</h3> <div align="center"> <p>Includes meaningful error responses for:</p> <ul> <li><b>400</b> - Bad Request</li> <li><b>401</b> - Unauthorized</li> <li><b>404</b> - Not Found</li> <li><b>500</b> - Server Error</li> </ul> </div>
+<h3 align="center">📑 License:</h3> <div align="center"> <p>MIT License</p> </div> <h3 align="center">Connect with Me:</h3> <p align="center"> <a href="https://linkedin.com/in/atif468" target="blank"><img align="center" src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/linked-in-alt.svg" alt="LinkedIn" height="30" width="40" /></a> <a href="https://www.hackerrank.com/atif_22015001907" target="blank"><img align="center" src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/hackerrank.svg" alt="HackerRank" height="30" width="40" /></a> <a href="https://www.leetcode.com/atif_32395" target="blank"><img align="center" src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/leet-code.svg" alt="LeetCode" height="30" width="40" /></a> <a href="https://auth.geeksforgeeks.org/user/atifans468" target="blank"><img align="center" src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/geeks-for-geeks.svg" alt="GeeksforGeeks" height="30" width="40" /></a> </p> <div align="center"> <p><img align="center" src="https://github-readme-stats.vercel.app/api/top-langs?username=atif468&show_icons=true&locale=en&layout=compact" alt="Top Languages" /></p> <p>&nbsp;<img align="center" src="https://github-readme-stats.vercel.app/api?username=atif468&show_icons=true&locale=en" alt="GitHub Stats" /></p> <p><img align="center" src="https://github-readme-streak-stats.herokuapp.com/?user=atif468&" alt="Streak Stats" /></p> </div>
