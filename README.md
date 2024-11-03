@@ -42,7 +42,7 @@ To get your development environment up and running, follow these steps:
 
 1. **Clone the Repository**:
    ```bash
-   git clone <repository-link>
+   git clone https://github.com/Atif468/PodCastApp-Back-end.git
    cd podcast-backend
 
 <h2>🛠️ API Endpoints:</h2>
