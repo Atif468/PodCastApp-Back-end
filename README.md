@@ -1,5 +1,52 @@
+<h2>🛠️ API Endpoints:</h2>
 
-<h1>📁 Project Structure</h1>
+<table>
+    <thead>
+        <tr>
+            <th>Method</th>
+            <th>Endpoint</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>POST</td>
+            <td>/auth/signup</td>
+            <td>Register new users</td>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td>/auth/login</td>
+            <td>User login</td>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td>/podcasts/upload</td>
+            <td>Upload a new podcast</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/podcasts</td>
+            <td>Retrieve all podcasts</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/podcasts/liked/</td>
+            <td>Get liked podcasts by user ID</td>
+        </tr>
+        <tr>
+            <td>PUT</td>
+            <td>/podcasts/like/</td>
+            <td>Like or unlike a podcast</td>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td>/playlists/add/</td>
+            <td>Add a podcast to user's playlist</td>
+        </tr>
+    </tbody>
+</table>
+<h2>📁 Project Structure</h2>
 <pre>project-root
     │
     ├── config
