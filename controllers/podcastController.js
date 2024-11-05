@@ -135,7 +135,7 @@ export const getLiked = async (req, res) => {
   try {
     // Find the podcast by Object ID
     const podcastId = "6700e9fa5dd3c0525e842273"; // Ensure this is a valid ObjectId
-    const podcast = await PodcastModel.findById(podcastId);
+    const podcast = await PodcastModel.findById(id);
 
     if (!podcast) {
       return res.status(404).json({ message: "Podcast not found" });
