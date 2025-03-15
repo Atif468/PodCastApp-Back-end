@@ -29,6 +29,8 @@ const userSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: "Podcast"
         }],
+        resetToken: String,
+        resetTokenExpires: Date,
     },
     { timestamps: true }
 );
