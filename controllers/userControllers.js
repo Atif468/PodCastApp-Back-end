@@ -38,6 +38,9 @@ export const SignUp = async (req, res) => {
 export const Login = async (req, res) => {
   const { email, password } = req.body;
 
+  console.log(email, password);
+
+
   try {
     const user = await User.findOne({ email });
     if (!user) {
@@ -68,6 +71,8 @@ export const Login = async (req, res) => {
 export const ForgetPassword = async (req, res) => {
   const { email } = req.body;
 
+  console.log(email);
+
   if (!email) {
     return res.status(400).json({ message: "Email is required" });
   }
@@ -79,7 +84,7 @@ export const ForgetPassword = async (req, res) => {
     }
 
     const resetToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
+      expiresIn: "5h",
     });
 
     user.resetToken = resetToken;
